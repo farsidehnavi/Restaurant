@@ -5,6 +5,7 @@ from tkinter.font import Font
 
 client = pymongo.MongoClient('mongodb://localhost:27017/')
 DB = client['ByPy']
+# DB.create_collection('Restaurant')
 # DB.create_collection('Order')
 DBAdmin = DB.Restaurant
 DBOrder = DB.Order
@@ -44,26 +45,20 @@ def UI():
     Button(HomePage,text='Admin page',command=OpenLoginPage).grid(column=0,row=5,sticky='ew')
 
     Button(HomePage,text='Place order',command=PlaceOrder).grid(column=1,row=5,sticky='ew')
+    
+    Button(HomePage,text='Developer Button',command=DevButton).grid(column=0,row=6,sticky='ew')
+    
+    Button(HomePage,text='Developer Button2',command=DevButton2).grid(column=1,row=6,sticky='ew')
 
-
-
-# FOODS = [
-#     ['Pizza',12.99],
-#     ['Burger',9.99],
-#     ['Pasta',11.99],
-#     ['Salad',7.99]
-# ]
 
 
 FOODS = [i for i in DBAdmin.find()]
-
-
 ORDERS = [i[''] for i in DBOrder.find()]
-
-
-FoodList = []
-
+Stock = []
 Cart = []
+
+
+
 
 class Food:
     def __init__(self,Name,Price):
@@ -73,22 +68,26 @@ class Food:
     def AddToStockListBox(self):
         StockListBox.insert(END,'  '+self.Name+'  '+str(self.Price)+'$  ')
 
-    def RemoveFromStockListBox(self,ID):
-        StockListBox.delete(ID)
+    def RemoveFromStockListBox(self):
+        StockListBox.delete(self)
 
-    def AddToCart(self,ID):
-        Cart.append(ID)
+    def AddToCart(self):
+        Cart.append(self)
         CartListBox.insert(END,'  '+self.Name+'  '+str(self.Price)+'$  ')
 
-    def AddToDBOrder(self,ID):
-        DBOrder.insert_one({'':ID})
+    def AddToDBOrder(self):
+        DBOrder.insert_one({'':self})
 
     def RemoveFromCart(self,ID):
-        Cart.remove(Cart[ID])
+        global Cart
+        for i in range(len(Cart)):
+            if Cart[i] == self:
+                del Cart[i]
+                break
         CartListBox.delete(ID)
 
-    def RemoveFromDBOrder(self,ID):
-        DBOrder.delete_one({'':ID})
+    def RemoveFromDBOrder(self):
+        DBOrder.delete_one({'':self})
 
 
 
@@ -98,17 +97,17 @@ class Food:
 
 
 def GenerateFoods():
-    global FoodList
+    global Stock
     for i in FOODS:
-        FoodList.append(Food(i['Name'],i['Cost']))
-    for i in FoodList:
+        Stock.append(Food(i['Name'],i['Cost']))
+    for i in Stock:
         i.AddToStockListBox()
 
 
 def GenerateOrders():
     global Cart
     for i in ORDERS:
-        FoodList[i].AddToCart(i)
+        Stock[i].AddToCart(i)
 
 
 
@@ -118,18 +117,17 @@ def GenerateOrders():
 
 def AddToCart():
     selected_indices = StockListBox.curselection()
-    if(selected_indices):
-        FoodList[selected_indices[0]].AddToCart(selected_indices[0])
-        FoodList[selected_indices[0]].AddToDBOrder(selected_indices[0])
+    if selected_indices:
+        Stock[selected_indices[0]].AddToCart()
+        # Stock[selected_indices[0]].AddToDBOrder(selected_indices[0])
     else:
         print("No item selected")
 
 def RemoveFromCart():
     selected_indices = CartListBox.curselection()
     if selected_indices:
-        FoodList[selected_indices[0]].RemoveFromCart(selected_indices[0])
-        FoodList[selected_indices[0]].RemoveFromDBOrder(selected_indices[0])
-        print(selected_indices[0])
+        Cart[selected_indices[0]].RemoveFromCart(selected_indices[0])
+        # Stock[selected_indices[0]].RemoveFromDBOrder(selected_indices[0])
     else:
         print("No item selected")
 
@@ -154,7 +152,14 @@ def PlaceOrder():
     
 
 
+def DevButton():
+    
+    Cart[5].RemoveFromCart(5)
+    
 
+def DevButton2():
+    
+    print(Cart)
 
 
 
@@ -166,5 +171,15 @@ def Controller():
     GenerateOrders()
     HomePage.mainloop()
 Controller()
+
+
+
+
+
+
+
+
+
+
 
 
