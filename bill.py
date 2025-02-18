@@ -6,7 +6,6 @@ from tkinter.font import Font
 
 client = pymongo.MongoClient('mongodb://localhost:27017/')
 DB = client['ByPy']
-DBAdmin = DB.Restaurant
 DBOrder = DB.Order
 
 def UI():
@@ -25,26 +24,37 @@ def UI():
     
     global TotalLabel
     TotalLabel = Label(BillPage,font=PageFont)
-    TotalLabel.grid(column=0,row=1)
+    TotalLabel.grid(column=0,row=2)
 
 
 ORDER = [i for i in DBOrder.find()]
-print(ORDER)
 
 
-FOODLIST = [i for i in DBAdmin.find()]
 
 
-def LoadBill():
+def LoadItems():
+    FullTabel = ''
+    for i in ORDER:
+        FullTabel += f'{i['Name']}    {i['Price']}$\n'
+    BillLabel.config(text=FullTabel)
+
+
+
+
+
+def CalculateTotalCost():
     TotalCost = 0
     for i in ORDER:
-        print(FOODLIST[i])
-    # TotalLabel.config(text=TotalCost)
+        TotalCost += float(i['Price'])*100
+    TotalLabel.config(text=str(TotalCost/100)+'$')
 
 
 
 
-LoadBill()
+def Controller():
+    UI()
+    LoadItems()
+    CalculateTotalCost()
 
 
 

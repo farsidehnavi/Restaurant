@@ -34,8 +34,10 @@ def UI():
     
     
     global EmptyCartError
-    EmptyCartError = Label(HomePage,font=PageFont,text='At least you need to select one product !',fg='red')
+    EmptyCartError = Label(HomePage,font=PageFont,text='At least you need to choose a product !',fg='red')
 
+    global NothingIsSelectedError
+    NothingIsSelectedError = Label(HomePage,font=PageFont,text='No Item is selected !',fg='red')
 
     Button(HomePage,text='Add to Cart',command=AddToCart).grid(column=0,row=4,sticky='ew')
 
@@ -50,14 +52,14 @@ def UI():
     
     Button(HomePage,text='Developer Button2',command=DevButton2).grid(column=1,row=6,sticky='ew')
 
+def _idRemover(inp):
+    del inp['_id']
+    return inp
 
-
-FOODS = [i for i in DBAdmin.find()]
-ORDERS = [i[''] for i in DBOrder.find()]
+FOODS = [_idRemover(i) for i in DBAdmin.find()]
+ORDERS = [_idRemover(i) for i in DBOrder.find()]
 Stock = []
 Cart = []
-
-
 
 
 class Food:
@@ -75,9 +77,6 @@ class Food:
         Cart.append(self)
         CartListBox.insert(END,'  '+self.Name+'  '+str(self.Price)+'$  ')
 
-    def AddToDBOrder(self):
-        DBOrder.insert_one({'':self})
-
     def RemoveFromCart(self,ID):
         global Cart
         for i in range(len(Cart)):
@@ -86,8 +85,19 @@ class Food:
                 break
         CartListBox.delete(ID)
 
+    def ToDict(self):
+        return {
+            'Name': self.Name,
+            'Price': self.Price
+        }
+
+    def AddToDBOrder(self):
+        DBOrder.insert_one(self.ToDict())
+
     def RemoveFromDBOrder(self):
-        DBOrder.delete_one({'':self})
+        DBOrder.delete_one(self.ToDict())
+        print('del')
+
 
 
 
@@ -99,15 +109,20 @@ class Food:
 def GenerateFoods():
     global Stock
     for i in FOODS:
-        Stock.append(Food(i['Name'],i['Cost']))
+        Stock.append(Food(i['Name'],i['Price']))
     for i in Stock:
         i.AddToStockListBox()
 
 
 def GenerateOrders():
-    global Cart
     for i in ORDERS:
-        Stock[i].AddToCart(i)
+        if i in FOODS:
+            for j in Stock:
+                if i['Name'] == j.Name and i['Price'] == j.Price:
+                    j.AddToCart()
+        else:
+            DBOrder.delete_one({'Name':i['Name'],'Price':i['Price']})
+            
 
 
 
@@ -119,33 +134,36 @@ def AddToCart():
     selected_indices = StockListBox.curselection()
     if selected_indices:
         Stock[selected_indices[0]].AddToCart()
-        # Stock[selected_indices[0]].AddToDBOrder(selected_indices[0])
+        Stock[selected_indices[0]].AddToDBOrder()
     else:
-        print("No item selected")
+        StockListBox.config(highlightbackground='red',highlightcolor='red')
+        NothingIsSelectedError.grid(column=0,row=3,columnspan=2)
 
 def RemoveFromCart():
     selected_indices = CartListBox.curselection()
     if selected_indices:
+        Cart[selected_indices[0]].RemoveFromDBOrder()
         Cart[selected_indices[0]].RemoveFromCart(selected_indices[0])
-        # Stock[selected_indices[0]].RemoveFromDBOrder(selected_indices[0])
     else:
-        print("No item selected")
+        CartListBox.config(highlightbackground='red',highlightcolor='red')
+        NothingIsSelectedError.grid(column=0,row=3,columnspan=2)
 
 
 
 def OpenLoginPage():
     import Login
     Login.UI()
+    HomePage.destroy()
     Login.LoginPage.mainloop()
 
 
 
 def PlaceOrder():
     if len(Cart) != 0:
-        # import bill
-        # bill.UI()
-        # bill.BillPage.mainloop()
-        print(Cart)
+        import bill
+        bill.Controller()
+        bill.BillPage.mainloop()
+        DBOrder.drop()
     else:
         CartListBox.config(highlightbackground='red',highlightcolor='red')
         EmptyCartError.grid(column=0,row=3,columnspan=2)
@@ -153,12 +171,10 @@ def PlaceOrder():
 
 
 def DevButton():
-    
     Cart[5].RemoveFromCart(5)
-    
+
 
 def DevButton2():
-    
     print(Cart)
 
 

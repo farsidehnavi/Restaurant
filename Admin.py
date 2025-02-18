@@ -11,10 +11,10 @@ DB = DB.Restaurant
 EntryList = []
 
 
-def AddToDB(Name,Cost):
+def AddToDB(Name,Price):
     DB.insert_one({
         'Name':Name,
-        'Cost':Cost
+        'Price':Price
     })
 
 def CheckIfAnyItemIsActive():
@@ -47,7 +47,7 @@ def Update():
     if CheckIfAnyItemIsActive():
         ActiveItemNumber = StockList.curselection()[0]
         ActiveItem = DB.find()[ActiveItemNumber]
-        ActiveItemProperties = [ActiveItem['Name'],ActiveItem['Cost']]
+        ActiveItemProperties = [ActiveItem['Name'],ActiveItem['Price']]
         for i in range(2):
             EntryTextAdder(i,ActiveItemProperties[i])
         Remove()
@@ -80,7 +80,7 @@ Pady = 5
 # img_tk = rounded_rectangle(200,35,35,'olive')
 
 
-header = Label(Window,text='Car store',font=PageFont,bg='black',fg='white')
+header = Label(Window,text='Admin !',font=PageFont,bg='black',fg='white')
 header.grid(row=0,column=0,columnspan=2,pady=Pady)
 
 StockList = Listbox(Window,font=PageFont,bg='olive',fg='white')
@@ -117,7 +117,7 @@ def CreateLabel(Text,Row,Column):
 
 
 def LabelGenerator():
-    for i in [['Stock list',1,0],['Name',1,1],['Cost $',3,1]]:
+    for i in [['Stock list',1,0],['Name',1,1],['Price $',3,1]]:
         CreateLabel(i[0],i[1],i[2])
 
 LabelGenerator()
@@ -134,7 +134,7 @@ def ClearStockList():
 
 def RefillStockList():
     for i in DB.find():
-        StockList.insert(END,i['Name']+' '+i['Cost']+'$')
+        StockList.insert(END,i['Name']+' '+i['Price']+'$')
 
 def UpdateStockList():
     ClearStockList()

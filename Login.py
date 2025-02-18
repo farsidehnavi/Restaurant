@@ -32,5 +32,5 @@ def ShowLoginError():
     Label(LoginPage,text='Username or Password incorrect !',fg='red').grid(column=0,row=3)
 
 def OpenAdmin():
+    LoginPage.destroy()
     import Admin
-    # Admin.Window.mainloop()
