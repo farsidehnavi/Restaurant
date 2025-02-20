@@ -6,18 +6,23 @@ from tkinter.font import Font
 def UI():
     global LoginPage
     LoginPage = Tk(className='login')
-    
-    PageFont = Font(LoginPage,family='Playwrite GB S ExtraLight',size=11)
+    LoginPage.config(bg='black')
 
-    Label(LoginPage,text='Login to Admin !',font=PageFont).grid(column=0,row=0)
+    SmallPageFont = Font(LoginPage,family='Comic Sans MS',size=11)
+    HugePageFont = Font(LoginPage,family='Comic Sans MS',size=13)
 
-    Username = Entry(LoginPage,font=PageFont)
-    Username.grid(column=0,row=1)
+    Padx = 10
+    Pady = 5
 
-    Password = Entry(LoginPage,font=PageFont)
-    Password.grid(column=0,row=2)
+    Label(LoginPage,bg='black',fg='white',text='Login to Admin !',font=HugePageFont).grid(column=0,row=0,padx=Padx,pady=Pady)
 
-    Button(LoginPage,text='Login',font=PageFont,command=lambda: Login(Username.get(),Password.get())).grid(column=0,row=4)
+    Username = Entry(LoginPage,font=SmallPageFont,fg='white',bg='olive')
+    Username.grid(column=0,row=1,padx=Padx,pady=Pady)
+
+    Password = Entry(LoginPage,font=SmallPageFont,fg='white',bg='olive')
+    Password.grid(column=0,row=2,padx=Padx,pady=Pady)
+
+    Button(LoginPage,activebackground='black',activeforeground='black',cursor='hand2',borderwidth=0,bg='black',fg='white',text='Login',font=HugePageFont,command=lambda: Login(Username.get(),Password.get())).grid(column=0,row=4,padx=Padx,pady=Pady,sticky='EW')
 
 def Login(Username,Password):
     if Username == 'admin':

@@ -70,7 +70,7 @@ Window.configure(bg='black')
 
 
 
-PageFont = Font(Window,family='Playwrite GB S ExtraLight',size=11)
+PageFont = Font(Window,family='Comic Sans MS',size=11)
 
 Padx = 10
 Pady = 5

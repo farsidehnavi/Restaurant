@@ -13,7 +13,7 @@ def UI():
     global BillPage
     BillPage = Tk(className='bill')
 
-    PageFont = Font(BillPage,family='Playwrite GB S ExtraLight',size=11)
+    PageFont = Font(BillPage,family='Comic Sans MS',size=11)
 
     Label(BillPage,text='Bill !',font=PageFont).grid(column=0,row=0)
 

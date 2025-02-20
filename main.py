@@ -16,41 +16,39 @@ def UI():
 
     global HomePage
     HomePage = Tk(className='restaurant')
+    HomePage.config(bg='black')
 
-    PageFont = Font(HomePage,family='Playwrite GB S ExtraLight',size=11)
+    SmallPageFont = Font(HomePage,family='Comic Sans MS',size=11)
+    HugePageFont = Font(HomePage,family='Comic Sans MS',size=13)
+    
+    Padx = 10
+    Pady = 5
 
-    Label(HomePage,text='Welcome to our Restaurant !',font=PageFont,padx=10,pady=10).grid(row=0,column=0,columnspan=2)
-    Label(HomePage,text='Stock',font=PageFont,padx=10,pady=10).grid(row=1,column=0)
-    Label(HomePage,text='Cart',font=PageFont,padx=10,pady=10).grid(row=1,column=1)
+    Label(HomePage,fg='white',bg='black',text='Welcome to our Restaurant !',font=HugePageFont,padx=10,pady=10).grid(row=0,column=0,columnspan=2)
+    Label(HomePage,fg='white',bg='black',text='Stock',font=SmallPageFont,padx=10,pady=10).grid(row=1,column=0)
+    Label(HomePage,fg='white',bg='black',text='Cart',font=SmallPageFont,padx=10,pady=10).grid(row=1,column=1)
 
 
     global StockListBox
-    StockListBox = Listbox(HomePage,font=PageFont)
-    StockListBox.grid(column=0,row=2,rowspan=1)
+    StockListBox = Listbox(HomePage,fg='white',bg='olive',font=SmallPageFont)
+    StockListBox.grid(column=0,row=2,rowspan=1,padx=Padx,pady=Pady)
 
     global CartListBox
-    CartListBox = Listbox(HomePage,font=PageFont)
-    CartListBox.grid(column=1,row=2)
+    CartListBox = Listbox(HomePage,fg='white',bg='olive',font=SmallPageFont)
+    CartListBox.grid(column=1,row=2,padx=Padx,pady=Pady)
     
     
     global EmptyCartError
-    EmptyCartError = Label(HomePage,font=PageFont,text='At least you need to choose a product !',fg='red')
+    EmptyCartError = Label(HomePage,font=SmallPageFont,text='At least you need to choose a product !',fg='red')
 
     global NothingIsSelectedError
-    NothingIsSelectedError = Label(HomePage,font=PageFont,text='No Item is selected !',fg='red')
+    NothingIsSelectedError = Label(HomePage,font=SmallPageFont,text='No Item is selected !',fg='red')
 
-    Button(HomePage,text='Add to Cart',command=AddToCart).grid(column=0,row=4,sticky='ew')
+    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Add to Cart',command=AddToCart).grid(column=0,row=4,sticky='ew')
+    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Remove from cart',command=RemoveFromCart).grid(column=1,row=4,sticky='ew')
+    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Admin page',command=OpenLoginPage).grid(column=0,row=5,sticky='ew')
+    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Place order',command=PlaceOrder).grid(column=1,row=5,sticky='ew')
 
-    Button(HomePage,text='Remove from cart',command=RemoveFromCart).grid(column=1,row=4,sticky='ew')
-
-
-    Button(HomePage,text='Admin page',command=OpenLoginPage).grid(column=0,row=5,sticky='ew')
-
-    Button(HomePage,text='Place order',command=PlaceOrder).grid(column=1,row=5,sticky='ew')
-    
-    Button(HomePage,text='Developer Button',command=DevButton).grid(column=0,row=6,sticky='ew')
-    
-    Button(HomePage,text='Developer Button2',command=DevButton2).grid(column=1,row=6,sticky='ew')
 
 def _idRemover(inp):
     del inp['_id']
@@ -168,14 +166,6 @@ def PlaceOrder():
         CartListBox.config(highlightbackground='red',highlightcolor='red')
         EmptyCartError.grid(column=0,row=3,columnspan=2)
     
-
-
-def DevButton():
-    Cart[5].RemoveFromCart(5)
-
-
-def DevButton2():
-    print(Cart)
 
 
 
