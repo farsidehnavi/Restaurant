@@ -65,3 +65,4 @@ def Controller():
 
 
 
+DBOrder.delete_many({})

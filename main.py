@@ -174,10 +174,10 @@ def OpenLoginPage():
 
 def PlaceOrder():
     if len(Cart) != 0:
+        CartListBox.delete(0,END)
         import bill
         bill.Controller()
         bill.BillPage.mainloop()
-        DBOrder.drop()
     else:
         CartListBox.config(highlightbackground='red',highlightcolor='red')
         EmptyCartError.grid(column=0,row=4,columnspan=2)
@@ -192,7 +192,7 @@ def CheckIfAnyItemIsActive():
 def FullInfoLabelUpdater(event):
     if CheckIfAnyItemIsActive():
         FullInfoGenerator()
-        
+
 
 
 def FullInfoGenerator():
