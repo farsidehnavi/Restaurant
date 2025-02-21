@@ -32,6 +32,7 @@ def UI():
     global StockListBox
     StockListBox = Listbox(HomePage,fg='white',bg='olive',font=SmallPageFont)
     StockListBox.grid(column=0,row=2,rowspan=1,padx=Padx,pady=Pady)
+    StockListBox.bind("<<ListboxSelect>>", FullInfoLabelUpdater)
 
     global CartListBox
     CartListBox = Listbox(HomePage,fg='white',bg='olive',font=SmallPageFont)
@@ -44,10 +45,14 @@ def UI():
     global NothingIsSelectedError
     NothingIsSelectedError = Label(HomePage,font=SmallPageFont,text='No Item is selected !',fg='red')
 
-    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Add to Cart',command=AddToCart).grid(column=0,row=4,sticky='ew')
-    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Remove from cart',command=RemoveFromCart).grid(column=1,row=4,sticky='ew')
-    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Admin page',command=OpenLoginPage).grid(column=0,row=5,sticky='ew')
-    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Place order',command=PlaceOrder).grid(column=1,row=5,sticky='ew')
+    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Add to Cart',command=AddToCart).grid(column=0,row=5,sticky='ew')
+    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Remove from cart',command=RemoveFromCart).grid(column=1,row=5,sticky='ew')
+    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Admin page',command=OpenLoginPage).grid(column=0,row=6,sticky='ew')
+    Button(HomePage,activebackground='black',activeforeground='black',font=HugePageFont,padx=Padx,pady=Pady,cursor='hand2',borderwidth=0,bg='black',fg='white',text='Place order',command=PlaceOrder).grid(column=1,row=6,sticky='ew')
+    
+    global SelectedItemInfo
+    SelectedItemInfo = Label(HomePage,bg='black',fg='white',font=SmallPageFont)
+    SelectedItemInfo.grid(row=7,column=0,columnspan=2)
 
 
 def _idRemover(inp):
@@ -83,19 +88,30 @@ class Food:
                 break
         CartListBox.delete(ID)
 
-    def ToDict(self):
+    def ToDictFromDBAdmin(self,ID):
+        ActiveItem = list(DBAdmin.find())[ID]
         return {
-            'Name': self.Name,
-            'Price': self.Price
+            'Name':ActiveItem['Name'],
+            'Price':ActiveItem['Price'],
+            'DateOfPrice':ActiveItem['DateOfPrice'],
+            'SourceOfPrice':ActiveItem['SourceOfPrice']
+        }
+    
+    def ToDictFromDBOrder(self,ID):
+        ActiveItem = list(DBOrder.find())[ID]
+        return {
+            'Name':ActiveItem['Name'],
+            'Price':ActiveItem['Price'],
+            'DateOfPrice':ActiveItem['DateOfPrice'],
+            'SourceOfPrice':ActiveItem['SourceOfPrice']
         }
 
-    def AddToDBOrder(self):
-        DBOrder.insert_one(self.ToDict())
+    def AddToDBOrder(self,ID):
+        DBOrder.insert_one(self.ToDictFromDBAdmin(ID))
+        
 
-    def RemoveFromDBOrder(self):
-        DBOrder.delete_one(self.ToDict())
-        print('del')
-
+    def RemoveFromDBOrder(self,ID):
+        DBOrder.delete_one(self.ToDictFromDBOrder(ID))
 
 
 
@@ -132,7 +148,7 @@ def AddToCart():
     selected_indices = StockListBox.curselection()
     if selected_indices:
         Stock[selected_indices[0]].AddToCart()
-        Stock[selected_indices[0]].AddToDBOrder()
+        Stock[selected_indices[0]].AddToDBOrder(selected_indices[0])
     else:
         StockListBox.config(highlightbackground='red',highlightcolor='red')
         NothingIsSelectedError.grid(column=0,row=3,columnspan=2)
@@ -140,7 +156,7 @@ def AddToCart():
 def RemoveFromCart():
     selected_indices = CartListBox.curselection()
     if selected_indices:
-        Cart[selected_indices[0]].RemoveFromDBOrder()
+        Cart[selected_indices[0]].RemoveFromDBOrder(selected_indices[0])
         Cart[selected_indices[0]].RemoveFromCart(selected_indices[0])
     else:
         CartListBox.config(highlightbackground='red',highlightcolor='red')
@@ -164,8 +180,31 @@ def PlaceOrder():
         DBOrder.drop()
     else:
         CartListBox.config(highlightbackground='red',highlightcolor='red')
-        EmptyCartError.grid(column=0,row=3,columnspan=2)
+        EmptyCartError.grid(column=0,row=4,columnspan=2)
     
+    
+    
+    
+def CheckIfAnyItemIsActive():
+    return bool(StockListBox.curselection())
+
+
+def FullInfoLabelUpdater(event):
+    if CheckIfAnyItemIsActive():
+        FullInfoGenerator()
+        
+
+
+def FullInfoGenerator():
+    ActiveItemNumber = StockListBox.curselection()[0]
+    ActiveItem = DBAdmin.find()[ActiveItemNumber]
+    GeneratedText = f'{ActiveItem['Name']} was {ActiveItem['Price']} in {ActiveItem['DateOfPrice']} in {ActiveItem['SourceOfPrice']}'
+    SelectedItemInfo.config(text=GeneratedText)
+
+
+
+
+
 
 
 

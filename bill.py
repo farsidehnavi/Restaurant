@@ -12,19 +12,25 @@ def UI():
 
     global BillPage
     BillPage = Tk(className='bill')
+    BillPage.config(bg='black')
 
-    PageFont = Font(BillPage,family='Comic Sans MS',size=11)
 
-    Label(BillPage,text='Bill !',font=PageFont).grid(column=0,row=0)
+    SmallPageFont = Font(BillPage,family='Comic Sans MS',size=11)
+    HugePageFont = Font(BillPage,family='Comic Sans MS',size=13)
+    
+    Padx = 10
+    Pady = 5
+
+    Label(BillPage,text='Thanks for buying !',font=HugePageFont,fg='white',bg='black').grid(column=0,row=0,padx=Padx,pady=Pady)
 
     global BillLabel
-    BillLabel = Label(BillPage,font=PageFont)
-    BillLabel.grid(column=0,row=1)
+    BillLabel = Label(BillPage,font=SmallPageFont,fg='white',bg='black')
+    BillLabel.grid(column=0,row=1,padx=Padx,pady=Pady)
 
     
     global TotalLabel
-    TotalLabel = Label(BillPage,font=PageFont)
-    TotalLabel.grid(column=0,row=2)
+    TotalLabel = Label(BillPage,font=HugePageFont,fg='white',bg='black')
+    TotalLabel.grid(column=0,row=2,padx=Padx,pady=Pady)
 
 
 ORDER = [i for i in DBOrder.find()]

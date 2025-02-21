@@ -11,10 +11,12 @@ DB = DB.Restaurant
 EntryList = []
 
 
-def AddToDB(Name,Price):
+def AddToDB(Name,Price,SourceOfPrice,DateOfPrice):
     DB.insert_one({
         'Name':Name,
-        'Price':Price
+        'Price':Price,
+        'SourceOfPrice':SourceOfPrice,
+        'DateOfPrice':DateOfPrice
     })
 
 def CheckIfAnyItemIsActive():
@@ -25,6 +27,7 @@ def Add():
     for i in range(len(EntryList)):
         EntryTextRemover(i)
     UpdateStockList()
+    AddButton.config(text='Add')
 
 def RemoveThisItem(ActiveItem):
     ActiveItemNumber = StockList.curselection()[0]
@@ -47,12 +50,28 @@ def Update():
     if CheckIfAnyItemIsActive():
         ActiveItemNumber = StockList.curselection()[0]
         ActiveItem = DB.find()[ActiveItemNumber]
-        ActiveItemProperties = [ActiveItem['Name'],ActiveItem['Price']]
-        for i in range(2):
+        ActiveItemProperties = [ActiveItem['Name'],ActiveItem['Price'],ActiveItem['SourceOfPrice'],ActiveItem['DateOfPrice']]
+        for i in range(4):
             EntryTextAdder(i,ActiveItemProperties[i])
         Remove()
+        AddButton.config(text='Save changes')
+        
+
+def CheckIfAnyItemIsActive():
+    return bool(StockList.curselection())
 
 
+def FullInfoLabelUpdater(event):
+    if CheckIfAnyItemIsActive():
+        FullInfoGenerator()
+        
+
+
+def FullInfoGenerator():
+    ActiveItemNumber = StockList.curselection()[0]
+    ActiveItem = DB.find()[ActiveItemNumber]
+    GeneratedText = f'{ActiveItem['Name']} was {ActiveItem['Price']} in {ActiveItem['DateOfPrice']} in {ActiveItem['SourceOfPrice']}'
+    SelectedItemInfo.config(text=GeneratedText)
 
 
 
@@ -85,6 +104,7 @@ header.grid(row=0,column=0,columnspan=2,pady=Pady)
 
 StockList = Listbox(Window,font=PageFont,bg='olive',fg='white')
 StockList.grid(row=2,column=0,rowspan=8,padx=Padx)
+StockList.bind("<<ListboxSelect>>", FullInfoLabelUpdater)
 
 AddButton = Button(Window,text='Add',cursor='hand2',command=Add,font=PageFont,borderwidth=0,compound='center',bg='black',fg='white')
 AddButton.grid(row=9,column=1,sticky='E,W',padx=Padx,pady=Pady)
@@ -95,17 +115,18 @@ UpdateButton.grid(row=10,column=0,sticky='E,W',padx=Padx,pady=Pady)
 RemoveButton = Button(Window,text='Remove this Item',cursor='hand2',command=Remove,font=PageFont,border=0,relief='solid',compound='center',bg='black',fg='white')
 RemoveButton.grid(row=10,column=1,sticky='E,W',padx=Padx,pady=Pady)
 
+SelectedItemInfo = Label(Window,bg='black',fg='white',font=PageFont)
+SelectedItemInfo.grid(row=11,column=0,columnspan=2)
 
 
-
-def CreateEntry(Row,Column):
+def CreateEntry(Row):
     EntryList.append(Entry(Window,bg='olive',font=PageFont,fg='white'))
-    EntryList[-1].grid(row=Row,column=Column,padx=Padx)
+    EntryList[-1].grid(row=Row,column=1,padx=Padx)
 
 
 def EntryGenerator():
-    for i in [[2,1],[4,1]]:
-        CreateEntry(i[0],i[1])
+    for i in range(2,9,2):
+        CreateEntry(i)
 
 EntryGenerator()
 
@@ -117,7 +138,7 @@ def CreateLabel(Text,Row,Column):
 
 
 def LabelGenerator():
-    for i in [['Stock list',1,0],['Name',1,1],['Price $',3,1]]:
+    for i in [['Stock list',1,0],['Name',1,1],['Price $',3,1],['Source of price',5,1],['Date of price',7,1]]:
         CreateLabel(i[0],i[1],i[2])
 
 LabelGenerator()
